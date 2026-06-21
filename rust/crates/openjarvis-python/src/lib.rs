@@ -1,4 +1,4 @@
-//! PyO3 bridge — exposes ~50 Rust classes to Python via `openjarvis_rust`.
+//! PyO3 bridge — exposes ~50 Rust classes to Python via `mark_xl_rust`.
 #![allow(clippy::redundant_closure, unused_variables)]
 
 use once_cell::sync::Lazy;
@@ -65,7 +65,7 @@ fn classify_query(query: &str) -> &'static str {
 }
 
 #[pymodule]
-fn openjarvis_rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn mark_xl_rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // --- Core types ---
     m.add_class::<core::PyMessage>()?;
     m.add_class::<core::PyToolResult>()?;

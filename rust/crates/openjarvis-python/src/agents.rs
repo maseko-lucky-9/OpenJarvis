@@ -84,9 +84,11 @@ impl PySimpleAgent {
         self.inner.accepts_tools()
     }
 
-    fn run(&self, input: &str) -> PyResult<PyAgentResult> {
-        let result = RUNTIME
-            .block_on(self.inner.run(input, None))
+    fn run(&self, py: Python<'_>, input: &str) -> PyResult<PyAgentResult> {
+        // Release the GIL while the synchronous tokio runtime drives the agent so
+        // a calling host UI thread never freezes (mark-xl fork patch: GIL safety).
+        let result = py
+            .allow_threads(|| RUNTIME.block_on(self.inner.run(input, None)))
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(PyAgentResult {
             content: result.content,
@@ -128,9 +130,11 @@ impl PyOrchestratorAgent {
         self.inner.accepts_tools()
     }
 
-    fn run(&self, input: &str) -> PyResult<PyAgentResult> {
-        let result = RUNTIME
-            .block_on(self.inner.run(input, None))
+    fn run(&self, py: Python<'_>, input: &str) -> PyResult<PyAgentResult> {
+        // Release the GIL while the synchronous tokio runtime drives the agent so
+        // a calling host UI thread never freezes (mark-xl fork patch: GIL safety).
+        let result = py
+            .allow_threads(|| RUNTIME.block_on(self.inner.run(input, None)))
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(PyAgentResult {
             content: result.content,
@@ -171,9 +175,11 @@ impl PyNativeReActAgent {
         self.inner.accepts_tools()
     }
 
-    fn run(&self, input: &str) -> PyResult<PyAgentResult> {
-        let result = RUNTIME
-            .block_on(self.inner.run(input, None))
+    fn run(&self, py: Python<'_>, input: &str) -> PyResult<PyAgentResult> {
+        // Release the GIL while the synchronous tokio runtime drives the agent so
+        // a calling host UI thread never freezes (mark-xl fork patch: GIL safety).
+        let result = py
+            .allow_threads(|| RUNTIME.block_on(self.inner.run(input, None)))
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(PyAgentResult {
             content: result.content,
@@ -226,9 +232,11 @@ impl PyNativeOpenHandsAgent {
         self.inner.accepts_tools()
     }
 
-    fn run(&self, input: &str) -> PyResult<PyAgentResult> {
-        let result = RUNTIME
-            .block_on(self.inner.run(input, None))
+    fn run(&self, py: Python<'_>, input: &str) -> PyResult<PyAgentResult> {
+        // Release the GIL while the synchronous tokio runtime drives the agent so
+        // a calling host UI thread never freezes (mark-xl fork patch: GIL safety).
+        let result = py
+            .allow_threads(|| RUNTIME.block_on(self.inner.run(input, None)))
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(PyAgentResult {
             content: result.content,
@@ -341,9 +349,11 @@ impl PyMonitorOperativeAgent {
         self.inner.accepts_tools()
     }
 
-    fn run(&self, input: &str) -> PyResult<PyAgentResult> {
-        let result = RUNTIME
-            .block_on(self.inner.run(input, None))
+    fn run(&self, py: Python<'_>, input: &str) -> PyResult<PyAgentResult> {
+        // Release the GIL while the synchronous tokio runtime drives the agent so
+        // a calling host UI thread never freezes (mark-xl fork patch: GIL safety).
+        let result = py
+            .allow_threads(|| RUNTIME.block_on(self.inner.run(input, None)))
             .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(e.to_string()))?;
         Ok(PyAgentResult {
             content: result.content,
