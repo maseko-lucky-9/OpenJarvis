@@ -64,6 +64,21 @@ fn classify_query(query: &str) -> &'static str {
     openjarvis_learning::classify_query(query)
 }
 
+#[pyfunction]
+fn _gil_probe(py: Python<'_>, millis: u64) -> PyResult<u64> {
+    // Test-only probe that mirrors the exact GIL-release pattern used by all 5
+    // agent run() sites (py.allow_threads(|| RUNTIME.block_on(...))). Hermetic —
+    // no network — so the AC5 "no UI freeze" test is deterministic in CI.
+    // Returns elapsed milliseconds.
+    let start = std::time::Instant::now();
+    py.allow_threads(|| {
+        RUNTIME.block_on(async {
+            tokio::time::sleep(std::time::Duration::from_millis(millis)).await;
+        })
+    });
+    Ok(start.elapsed().as_millis() as u64)
+}
+
 #[pymodule]
 fn mark_xl_rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // --- Core types ---
@@ -185,6 +200,7 @@ fn mark_xl_rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(is_sensitive_file, m)?)?;
     m.add_function(wrap_pyfunction!(register_builtin_models, m)?)?;
     m.add_function(wrap_pyfunction!(classify_query, m)?)?;
+    m.add_function(wrap_pyfunction!(_gil_probe, m)?)?;
     m.add_function(wrap_pyfunction!(skills::load_skill, m)?)?;
     m.add_function(wrap_pyfunction!(recipes::load_recipe, m)?)?;
     m.add_function(wrap_pyfunction!(templates::load_template, m)?)?;
